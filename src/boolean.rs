@@ -1,9 +1,9 @@
-use std::marker::PhantomData;
+//use std::marker::PhantomData;
 
 
 //
-pub struct True {}
-pub struct False {}
+pub struct True;
+pub struct False;
 
 pub trait ToBool {
     fn to_bool() -> bool;

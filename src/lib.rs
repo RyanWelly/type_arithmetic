@@ -2,7 +2,7 @@ use std::{marker::PhantomData};
 
 use crate::boolean::*;
 mod boolean;
-struct Zero {} // 0. Important to make sure we follow axiom that succ(a) != 0 for all nats a.
+struct Zero; // 0, the root of all evil (and all natural numbers!)
 
 struct Succ<Nat> {
     _marker: PhantomData<Nat> //just needs some kind of marker so we can retain the generic type; as recommended by the rust compiler, we use PhantomData.
@@ -23,6 +23,32 @@ impl<A,B: Add<A>> Add<A> for Succ<B> {
     type Result = Succ<<B as Add<A>>::Result>;
 }
 
+//Multiplication axioms;
+// a * 0 = 0
+// a * succ(b) = a + a * b
+
+
+trait Mul<Nat> {
+    type Result;
+}
+
+// a * 0 = 0
+impl<A> Mul<A> for Zero {
+    type Result = Zero;
+}
+
+
+// a * succ(b) = a + a * b
+impl<A: Add<B>, B: Mul<A>> Mul<A> for Succ<B> where <B as Mul<A>>::Result: Add<A>{
+    //type Result = <B as Mul<A>>::Result;
+    //type Result = <A as Add<<B as Mul<A>>::Result>>::Result;
+    type Result = <<B as Mul<A>>::Result as Add<A>>::Result;
+}
+
+
+
+
+
 //Trait for runtime testing. Given we can directly compare the types, this is no longer neccessary. 
 trait ToInt {
     fn to_int() -> u32;
@@ -39,6 +65,9 @@ impl<T: ToInt> ToInt for Succ<T> {
 }
 
 
+//Things to note about the tests; Most of them work by comparing the TypeId of each type, which gives useless 
+//error messages when they fail.
+
 #[test]
 fn test_peano() {
     type ZERO = Zero;
@@ -47,20 +76,31 @@ fn test_peano() {
     type THREE = Succ<TWO>;
     type FOUR = Succ<THREE>;
     type FIVE = Succ<FOUR>;
+    type SIX = Succ<FIVE>;
     println!("{}", <Succ<TWO> as Add<ZERO>>::Result::to_int());
 
     assert_eq!(<Succ<TWO> as Add<ZERO>>::Result::to_int(), <Succ<Succ<Succ<ZERO>>> as ToInt>::to_int());
-    //type ShouldBeFive = <TWO as Add<THREE>>::Result;
-    //type ShouldBeFive = <Zero as Add<THREE>>::Result;
  
 
-
+    //Tests for Addition
     assert_eq!(std::any::TypeId::of::<ONE>(), std::any::TypeId::of::<Succ<ZERO>>()); // 1 == succ(zero)
     assert_eq!(std::any::TypeId::of::<<TWO as Add<THREE>>::Result>(), std::any::TypeId::of::<FIVE>());  //2 + 3 == 5
     assert_eq!(std::any::TypeId::of::<<ZERO as Add<THREE>>::Result>(), std::any::TypeId::of::<THREE>());  //2 + 3 == 5
  
 
 
+
+    //Tests for Multiplication
+    type TwoTimesThree = <TWO as Mul<THREE>>::Result;
+
+
+    assert_eq!(std::any::TypeId::of::<TwoTimesThree>(), std::any::TypeId::of::<SIX>());
+    assert_eq!(std::any::TypeId::of::<<ZERO as Mul<TWO>>::Result>(), std::any::TypeId::of::<ZERO>());
+    assert_eq!(std::any::TypeId::of::<<TWO as Mul<ZERO>>::Result>(), std::any::TypeId::of::<ZERO>());
+    assert_eq!(std::any::TypeId::of::<<TWO as Mul<ONE>>::Result>(), std::any::TypeId::of::<TWO>());
+    assert_eq!(std::any::TypeId::of::<<TWO as Mul<Succ<ONE>>>::Result>(), std::any::TypeId::of::<FOUR>());
+
+ 
 }
 
 #[test]
@@ -74,7 +114,7 @@ fn test_boolean() {
 
     assert_eq!(std::any::TypeId::of::<<True as And<False>>::Output>(), std::any::TypeId::of::<False>());
     
-    assert_eq!(std::any::TypeId::of::<True>(), std::any::TypeId::of::<<False as Or<True>>::Output>());
+    assert_eq!(std::any::TypeId::of::<True>(), std::any::TypeId::of::<<False as Or<True>>::Output>()); //True == (False or True)
 
 
 }
