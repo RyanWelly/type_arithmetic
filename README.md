@@ -29,4 +29,9 @@ type OneHundred = int_to_type!(100); //expands to Succ<Succ...<Zero>>>... with 1
 
 Q: Why is this useful? Aren't we just making the compiler do slow math while compiling?
 
-A: Yes, this implemention is incredibly slow for any calculation that isn't with tiny integers, and was written to play around with Rust's type system. For an efficient implementation, you can look at the [typenum](https://github.com/paholg/typenum) crate. The crate that first got me interested in this was the [dimensioned](https://github.com/paholg/dimensioned) crate, which uses type level arithmetic to give you dimensional safety and tell you off at compile time when you try and add 5 metres to 20 seconds.
+A: Yes, this implemention is incredibly slow for any calculation that isn't with tiny integers, and was written to play around with Rust's type system. For an efficient implementation, you can look at the [typenum](https://github.com/paholg/typenum) crate. The crate that first got me interested in this was the [dimensioned](https://github.com/paholg/dimensioned) crate, which uses type level arithmetic to give you dimensional safety and tell you off at compile time when you try and add 5 metres to 20 seconds. Another cool crate is the [generic-array](https://github.com/fizyk20/generic-array) crate, which uses type-level arithmetic to create generic-length arrays.
+
+
+Q: Is this not incredibly inefficient?
+
+A: Yep. On my laptop, any number greater than about 1600 can't be represented; Try it yourself, int_to_type!(1500) will probably compile but int_to_type!(2000) probably won't.
