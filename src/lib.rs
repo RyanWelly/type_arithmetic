@@ -1,7 +1,8 @@
 use std::{marker::PhantomData};
-
 use crate::boolean::*;
 mod boolean;
+use seq_macro::seq;
+
 struct Zero; // 0, the root of all evil (and all natural numbers!)
 
 struct Succ<Nat> {
@@ -40,8 +41,8 @@ impl<A> Mul<A> for Zero {
 
 // a * succ(b) = a + a * b
 impl<A: Add<B>, B: Mul<A>> Mul<A> for Succ<B> where <B as Mul<A>>::Result: Add<A>{
-    //type Result = <B as Mul<A>>::Result;
-    //type Result = <A as Add<<B as Mul<A>>::Result>>::Result;
+    //The "where <B as Mul<A>>::Result: Add<A>" ensures that Rust knows we can add a * b to a; this is valid for all naturals a and b, 
+    //so this is all we need to do to implemenent multiplication for all non-zero naturals.
     type Result = <<B as Mul<A>>::Result as Add<A>>::Result;
 }
 
@@ -62,6 +63,16 @@ impl<T: ToInt> ToInt for Succ<T> {
     fn to_int() -> u32 { 
         1 + T::to_int() 
     }
+}
+
+
+
+
+
+//Converts an positive integer into the type equivalent. For example, int_to_type!(3) expands to Succ<Succ<Succ<Zero>>>, otherwise known as THREE or 3.
+macro_rules! int_to_type {
+    ($e:expr) => { 
+        seq!(N in 0..$e { #(Succ::<)* Zero #(>)*} ) };
 }
 
 
@@ -99,6 +110,14 @@ fn test_peano() {
     assert_eq!(std::any::TypeId::of::<<TWO as Mul<ZERO>>::Result>(), std::any::TypeId::of::<ZERO>());
     assert_eq!(std::any::TypeId::of::<<TWO as Mul<ONE>>::Result>(), std::any::TypeId::of::<TWO>());
     assert_eq!(std::any::TypeId::of::<<TWO as Mul<Succ<ONE>>>::Result>(), std::any::TypeId::of::<FOUR>());
+    type macro_test = int_to_type!(5);
+    assert_eq!(std::any::TypeId::of::<macro_test>(), std::any::TypeId::of::<FIVE>());
+
+    type TWELVE = int_to_type!(12);
+    type ONEHUNDRED = int_to_type!(1660);
+
+    assert_eq!(std::any::TypeId::of::<TWELVE>(),std::any::TypeId::of::<<THREE as Mul<FOUR>>::Result>());
+ 
 
  
 }
