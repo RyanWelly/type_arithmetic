@@ -56,3 +56,24 @@ impl And<False> for True {
     type Output = False;
 }
 
+
+//Maybe try and figure out how I can write something like impl Or<T: ToBool> for True to cover two cases at once.
+pub trait Or<P> {
+    type Output;
+}
+
+impl Or<True> for True {
+    type Output = True;
+}
+
+impl Or<False> for True {
+    type Output = True;
+}
+
+impl Or<True> for False {
+    type Output = True;
+}
+
+impl Or<False> for False {
+    type Output = False;
+}

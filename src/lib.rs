@@ -23,7 +23,7 @@ impl<A,B: Add<A>> Add<A> for Succ<B> {
     type Result = Succ<<B as Add<A>>::Result>;
 }
 
-//Trait for runtime testing. 
+//Trait for runtime testing. Given we can directly compare the types, this is no longer neccessary. 
 trait ToInt {
     fn to_int() -> u32;
 }
@@ -72,6 +72,9 @@ fn test_boolean() {
 
 
 
-    assert_eq!(std::any::TypeId::of::<<True as And<False>>::Output>(), std::any::TypeId::of::<False>());  
+    assert_eq!(std::any::TypeId::of::<<True as And<False>>::Output>(), std::any::TypeId::of::<False>());
+    
+    assert_eq!(std::any::TypeId::of::<True>(), std::any::TypeId::of::<<False as Or<True>>::Output>());
+
 
 }
