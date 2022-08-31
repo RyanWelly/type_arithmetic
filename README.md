@@ -1,0 +1,1 @@
+Playing around with Rust's type system, implemented basic Peano arithmetic (only up to addition, so technically only Presburger arithmetic), and some simple boolean functions solely in rust's type system. Todo: Add multiplication to peano, and implement a type-level modular arithmetic.
