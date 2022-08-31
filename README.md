@@ -16,10 +16,16 @@ assert_eq!(std::any::TypeId::of::<<One as Add<Two>>::Result>(), std::any::TypeId
 <One as Mul<Two>> == Two //We can also use multiplication!
 
 
+
 ```
 
-There is also some traits to compare the value of the types at runtime (ToInt and ToBool), but these aren't really needed since you can directly compare the types.
+There is also a macro to easily create the desired integer types:
 
+```
+type One = Succ<Zero>;
+type OneHundred = int_to_type!(100); //expands to Succ<Succ...<Zero>>>... with 100 Succs, which represents the number 100.
+
+```
 
 Q: Why is this useful? Aren't we just making the compiler do slow math while compiling?
 

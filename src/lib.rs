@@ -79,6 +79,7 @@ macro_rules! int_to_type {
 //Things to note about the tests; Most of them work by comparing the TypeId of each type, which gives useless 
 //error messages when they fail.
 
+//TODO: tidy up tests.
 #[test]
 fn test_peano() {
     type ZERO = Zero;
