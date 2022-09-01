@@ -75,7 +75,7 @@ macro_rules! int_to_type {
         seq!(N in 0..$e { #(Succ<)* Zero #(>)*} ) };
 }
 
-macro_rules! compare_types {
+macro_rules! assert_types_eq {
     ($x:ty, $y:ty) => {
         assert_eq!(std::any::TypeId::of::<$x>(), std::any::TypeId::of::<$y>());
     };
@@ -124,7 +124,9 @@ fn test_peano() {
     type TWELVE = int_to_type!(12);
     type ONEHUNDRED = int_to_type!(100);
     assert_eq!(std::any::TypeId::of::<TWELVE>(),std::any::TypeId::of::<<THREE as Mul<FOUR>>::Result>());
-    compare_types!(TWELVE, <THREE as Mul<FOUR>>::Result);
+    assert_types_eq!(TWELVE, <THREE as Mul<FOUR>>::Result);
+    assert_types_eq!(int_to_type!(100), <int_to_type!(25) as Mul<FOUR>>::Result);
+
 
  
 }

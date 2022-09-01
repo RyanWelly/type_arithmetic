@@ -11,7 +11,7 @@ type Three = Succ<Two>;
 
 <One as Add<Two>> == Three; //These types are equal, but this line of code is not valid rust; see next line for how to directly compare the types.
 
-assert_eq!(std::any::TypeId::of::<<One as Add<Two>>::Result>(), std::any::TypeId::of::<Three>());  //Checking the types are equal.
+assert_types_eq!(<One as Add<Two>>::Result, Three); //Checking the types are equal using simple homemade macro
 
 <One as Mul<Two>> == Two //We can also use multiplication!
 
@@ -22,9 +22,10 @@ assert_eq!(std::any::TypeId::of::<<One as Add<Two>>::Result>(), std::any::TypeId
 There is also a macro to easily create the desired integer types:
 
 ```
-type One = Succ<Zero>;
+type TwentyFive = int_to_type!(25);
 type OneHundred = int_to_type!(100); //expands to Succ<Succ...<Zero>>>... with 100 Succs, which represents the number 100.
 
+assert_types_eq!(OneHundred, <TwentyFive as Mul<Four>>::Result);
 ```
 
 Q: Why is this useful? Aren't we just making the compiler do slow math while compiling?
