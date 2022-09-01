@@ -6,7 +6,7 @@ use seq_macro::seq;
 struct Zero; // 0, the root of all evil (and all natural numbers!)
 
 struct Succ<Nat> {
-    _marker: PhantomData<Nat> //just needs some kind of marker so we can retain the generic type; as recommended by the rust compiler, we use PhantomData.
+    _marker: PhantomData<Nat> //Succ just needs some kind of marker so we can retain the generic type; as recommended by the rust compiler, we use PhantomData.
 }
 
 
@@ -75,6 +75,13 @@ macro_rules! int_to_type {
         seq!(N in 0..$e { #(Succ<)* Zero #(>)*} ) };
 }
 
+macro_rules! compare_types {
+    ($x:ty, $y:ty) => {
+        assert_eq!(std::any::TypeId::of::<$x>(), std::any::TypeId::of::<$y>());
+    };
+}
+
+
 
 //Things to note about the tests; Most of them work by comparing the TypeId of each type, which gives useless 
 //error messages when they fail.
@@ -116,9 +123,8 @@ fn test_peano() {
 
     type TWELVE = int_to_type!(12);
     type ONEHUNDRED = int_to_type!(100);
-
     assert_eq!(std::any::TypeId::of::<TWELVE>(),std::any::TypeId::of::<<THREE as Mul<FOUR>>::Result>());
- 
+    compare_types!(TWELVE, <THREE as Mul<FOUR>>::Result);
 
  
 }
